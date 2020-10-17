@@ -2,7 +2,6 @@ import time
 import argparse
 import pickle as pkl
 import numpy as np
-from tqdm import tqdm
 from os import path
 from collections import defaultdict
 
@@ -82,7 +81,7 @@ class HMMTagger(object):
     
     def get_counts(self):
         print('Counting words and tags...')
-        for sentence in tqdm(self.sentences):
+        for sentence in self.sentences:
             i = 0
             previous_tag = None
             for word_tag in self.normalize_sentence(sentence):
@@ -132,18 +131,18 @@ class HMMTagger(object):
     def get_probabilities(self):
         print('Getting initial probabilities...')
         n_init = self.initial_count[0]
-        for tag, tag_count in tqdm(self.initial_count[1].items()):
+        for tag, tag_count in self.initial_count[1].items():
             self.initial_prob[tag] = tag_count / n_init
         
         print('Getting transition probabilities...')
-        for tag, (n_tag, next_tag_count) in tqdm(self.transition_count.items()):
+        for tag, (n_tag, next_tag_count) in self.transition_count.items():
             for next_tag, count in next_tag_count.items():
                 if tag not in self.transition_prob:
                     self.transition_prob[tag] = defaultdict(epsilon)
                 self.transition_prob[tag][next_tag] = count / n_tag
 
         print('Getting emission probabilities...')
-        for tag, (n_tag, word_count) in tqdm(self.emission_count.items()):
+        for tag, (n_tag, word_count) in self.emission_count.items():
             for word, count in word_count.items():
                 if tag not in self.emission_prob:
                     self.emission_prob[tag] = defaultdict(epsilon)
@@ -300,8 +299,7 @@ class HMMTagger(object):
             
         print('Testing...')
         for sentence, tagged_sentence in \
-                tqdm(zip(test_sentences, test_tagged_sentences),
-                     total=len(test_sentences)):
+                zip(test_sentences, test_tagged_sentences):
                     
             # Normalize sentence
             words_test = self.normalize_sentence(sentence)
